@@ -7,8 +7,11 @@ from bs4 import BeautifulSoup
 
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-from langchain_community.document_loaders.youtube import YoutubeLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders.youtube import YoutubeLoader
+
+from youtube_transcript_api import YouTubeTranscriptApi
+from urllib.parse import urlparse, parse_qs
 
 
 # -------------------- ENV --------------------
@@ -48,22 +51,49 @@ combine_prompt = PromptTemplate.from_template(
 )
 
 
-# -------------------- HELPER FUNCTION --------------------
+# -------------------- WEBSITE LOADER --------------------
 def extract_text_from_url(url):
     headers = {"User-Agent": "Mozilla/5.0"}
     response = requests.get(url, headers=headers, timeout=10)
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # Remove scripts/styles
     for script in soup(["script", "style"]):
         script.extract()
 
     text = soup.get_text(separator="\n")
-
-    # Clean text
     lines = [line.strip() for line in text.splitlines() if line.strip()]
+
     return "\n".join(lines)
+
+
+# -------------------- YOUTUBE HELPERS --------------------
+def get_video_id(url):
+    query = urlparse(url)
+    if "youtube.com" in url:
+        return parse_qs(query.query).get("v", [None])[0]
+    elif "youtu.be" in url:
+        return query.path[1:]
+    return None
+
+
+def load_youtube_content(url):
+    try:
+        # Try LangChain loader
+        loader = YoutubeLoader.from_youtube_url(url)
+        docs = loader.load()
+        return " ".join([doc.page_content for doc in docs])
+
+    except Exception:
+        try:
+            # Fallback to transcript API
+            video_id = get_video_id(url)
+            transcript = YouTubeTranscriptApi.get_transcript(video_id)
+
+            return " ".join([t["text"] for t in transcript])
+
+        except Exception:
+            return None
 
 
 # -------------------- BUTTON --------------------
@@ -78,9 +108,11 @@ if st.button("✨ Generate Summary"):
 
             # -------- LOAD --------
             if "youtube.com" in generic_url or "youtu.be" in generic_url:
-                loader = YoutubeLoader.from_youtube_url(generic_url)
-                docs = loader.load()
-                text_data = " ".join([doc.page_content for doc in docs])
+                text_data = load_youtube_content(generic_url)
+
+                if not text_data:
+                    st.error("❌ This YouTube video has no captions available")
+                    st.stop()
 
             else:
                 text_data = extract_text_from_url(generic_url)
