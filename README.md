@@ -1,22 +1,44 @@
 # 🔗 AI URL Summarizer
 
-An AI-powered web application that extracts and summarizes content from **websites and YouTube videos** using LLMs. Built with Streamlit, LangChain, and Groq for fast, scalable summarization.
+<p align="center">
+  <b>Summarize any Website 🌐 or YouTube 🎥 video using LLMs</b>
+</p>
 
----
+<p align="center">
+  <a href="https://urlsummarizer-project3.streamlit.app/">🌍 Live Demo</a>
+</p>
 
-## 🚀 Live Demo
-👉 https://urlsummarizer-project3.streamlit.app/
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Streamlit-Deployed-success?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/LLM-Groq-orange?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge"/>
+</p>
 
 ---
 
 ## ✨ Features
 
 - 🔗 Summarize any website URL  
-- 🎥 Supports YouTube video summarization (via transcripts)  
+- 🎥 YouTube video summarization (via transcripts)  
 - ⚡ Fast inference using Groq (LLaMA 3)  
-- 🧠 Handles long content using Map-Reduce style summarization  
-- 🎨 Clean and modern Streamlit UI  
+- 🧠 Handles long content using Map-Reduce summarization  
+- 🎨 Clean and modern UI built with Streamlit  
 - 🔐 Secure API key handling  
+
+---
+
+## 📸 App Preview
+
+### 🏠 Home Interface
+<p align="center">
+  <img src="assets/home.png" width="750"/>
+</p>
+
+### 📄 Generated Summary
+<p align="center">
+  <img src="assets/output.png" width="750"/>
+</p>
 
 ---
 
@@ -26,19 +48,14 @@ An AI-powered web application that extracts and summarizes content from **websit
 - **LLM:** Groq (LLaMA 3)  
 - **Framework:** LangChain  
 - **Language:** Python  
-- **Data Sources:**  
-  - Web scraping  
-  - YouTube transcripts  
+
+### 📡 Data Sources
+- 🌐 Web scraping (BeautifulSoup)  
+- 🎥 YouTube transcripts  
 
 ---
 
-## 📸 Screenshot
-
-<p align="center">
-  <img src="assets/output.png" width="700"/>
-</p>
-
-## ⚙️ Installation
+## 🚀 Run Locally
 
 ```bash
 git clone https://github.com/KunalS6/URL_Summarizer.git
