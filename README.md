@@ -28,16 +28,13 @@
 
 ---
 
-## 📸 App Preview
-
-### 🏠 Home Interface
-<p align="center">
-  <img src="assets/home.png" width="750"/>
-</p>
-
-### 📄 Generated Summary
+### 📄 App Screenshots
 <p align="center">
   <img src="assets/output.png" width="750"/>
+</p>
+
+<p align="center">
+  <img src="assets/output_1.png" width="750"/>
 </p>
 
 ---
