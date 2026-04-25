@@ -1,47 +1,54 @@
 # 🔗 AI URL Summarizer
 
-An AI-powered web application that extracts and summarizes content from **websites and YouTube videos** using LLMs. Built with Streamlit, LangChain, and Groq for fast, scalable summarization.
+<p align="center">
+  Summarize any Website 🌐 or YouTube 🎥 video using LLMs
+</p>
 
----
-
-## 🚀 Live Demo
-👉 https://your-app-name.streamlit.app
+<p align="center">
+  <img src="assets/app.png" width="800"/>
+</p>
 
 ---
 
 ## ✨ Features
 
-- 🔗 Summarize any website URL  
-- 🎥 Supports YouTube video summarization (via transcripts)  
-- ⚡ Fast inference using Groq (LLaMA 3)  
-- 🧠 Handles long content using Map-Reduce style summarization  
-- 🎨 Clean and modern Streamlit UI  
-- 🔐 Secure API key handling  
+- 🌐 Summarize any website URL  
+- 🎥 Summarize YouTube videos (with captions)  
+- ⚡ Fast and lightweight  
+- 🧠 Powered by LLM (Groq)  
+- ☁️ Deployable on Streamlit Cloud  
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Home Page
+<p align="center">
+  <img src="assets/home.png" width="700"/>
+</p>
+
+### 📄 Generated Summary
+<p align="center">
+  <img src="assets/output.png" width="700"/>
+</p>
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Streamlit  
-- **LLM:** Groq (LLaMA 3)  
-- **Framework:** LangChain  
-- **Language:** Python  
-- **Data Sources:**  
-  - Web scraping  
-  - YouTube transcripts  
+- Python  
+- Streamlit  
+- LangChain  
+- Groq API  
+- BeautifulSoup  
+- YouTube Transcript API  
 
 ---
 
-## 📸 Screenshot
-
-![App Screenshot](https://via.placeholder.com/800x400.png?text=Add+Your+Screenshot+Here)
-
----
-
-## ⚙️ Installation
+## 🚀 Run Locally
 
 ```bash
-git clone https://github.com/KunalS6/URL_Summarizer.git
-cd URL_Summarizer
+git clone https://github.com/your-username/url_summarizer.git
+cd url_summarizer
 pip install -r requirements.txt
 streamlit run app.py
