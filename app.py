@@ -14,7 +14,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # -------------------- ENV --------------------
 load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+
+# ✅ Works both locally and on Streamlit Cloud
+groq_api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
 
 if not groq_api_key:
     st.error("GROQ_API_KEY not found")
