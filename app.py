@@ -14,9 +14,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # -------------------- ENV --------------------
 load_dotenv()
-
-# ✅ Works both locally and on Streamlit Cloud
-groq_api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+groq_api_key = os.getenv("GROQ_API_KEY")
 
 if not groq_api_key:
     st.error("GROQ_API_KEY not found")
@@ -110,9 +108,10 @@ if st.button("✨ Generate Summary"):
             else:
                 loader = UnstructuredURLLoader(
                     urls=[generic_url],
-                    headers={"User-Agent": "Mozilla/5.0"},
-                    mode="elements",
-                    strategy="fast"
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                        "Accept-Language": "en-US,en;q=0.9",
+                    }
                 )
                 docs = loader.load()
 
