@@ -15,6 +15,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # -------------------- ENV --------------------
 load_dotenv()
 
+# ✅ Works locally + Streamlit Cloud
 groq_api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
 
 if not groq_api_key:
@@ -30,7 +31,7 @@ st.set_page_config(
 )
 
 
-# -------------------- CUSTOM UI --------------------
+# -------------------- UI --------------------
 st.markdown("""
 <style>
 .main-title {
@@ -97,25 +98,37 @@ if st.button("✨ Generate Summary"):
         with st.spinner("🚀 Processing..."):
 
             # -------- LOAD --------
+            docs = None
+
             if "youtube.com" in generic_url or "youtu.be" in generic_url:
                 try:
                     loader = YoutubeLoader.from_youtube_url(generic_url)
                     docs = loader.load()
                 except Exception:
-                    st.error("❌ Failed to load YouTube video (may not have captions)")
+                    st.error("❌ Failed to load YouTube video (maybe no captions)")
                     st.stop()
 
             else:
-                loader = UnstructuredURLLoader(
-                    urls=[generic_url],
-                    headers={
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-                        "Accept-Language": "en-US,en;q=0.9",
-                    },
-                    mode="elements",     # ✅ prevents heavy parsing
-                    strategy="fast"      # ✅ avoids spaCy usage
-                )
-                docs = loader.load()
+                # ✅ Primary loader (your working version)
+                try:
+                    loader = UnstructuredURLLoader(
+                        urls=[generic_url],
+                        headers={
+                            "User-Agent": "Mozilla/5.0",
+                        }
+                    )
+                    docs = loader.load()
+
+                # 🔥 Fallback (if site breaks)
+                except Exception:
+                    st.warning("⚠️ Using fallback parser...")
+                    loader = UnstructuredURLLoader(
+                        urls=[generic_url],
+                        headers={"User-Agent": "Mozilla/5.0"},
+                        mode="elements",
+                        strategy="fast"
+                    )
+                    docs = loader.load()
 
             if not docs:
                 st.error("❌ No content extracted")
