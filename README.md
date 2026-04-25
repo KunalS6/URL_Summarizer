@@ -5,7 +5,7 @@ An AI-powered web application that extracts and summarizes content from **websit
 ---
 
 ## 🚀 Live Demo
-👉 https://your-app-name.streamlit.app
+👉 https://urlsummarizer-project3.streamlit.app/
 
 ---
 
