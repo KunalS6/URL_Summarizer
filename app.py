@@ -35,10 +35,17 @@ generic_url = st.text_input("Enter URL")
 
 
 # -------------------- LLM --------------------
+'''
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     api_key=groq_api_key
 )
+'''
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",   # ← replace 70B
+    api_key=groq_api_key
+)
+
 
 
 # -------------------- PROMPTS --------------------
