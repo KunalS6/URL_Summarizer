@@ -2,20 +2,17 @@ import validators
 import streamlit as st
 import os
 from dotenv import load_dotenv
+import requests
+from bs4 import BeautifulSoup
 
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-
-from langchain_community.document_loaders import UnstructuredURLLoader
 from langchain_community.document_loaders.youtube import YoutubeLoader
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 # -------------------- ENV --------------------
 load_dotenv()
-
-# ✅ Works locally + Streamlit Cloud
 groq_api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
 
 if not groq_api_key:
@@ -24,50 +21,14 @@ if not groq_api_key:
 
 
 # -------------------- PAGE CONFIG --------------------
-st.set_page_config(
-    page_title="AI URL Summarizer",
-    page_icon="✨",
-    layout="centered"
-)
+st.set_page_config(page_title="AI URL Summarizer", page_icon="✨")
 
-
-# -------------------- UI --------------------
-st.markdown("""
-<style>
-.main-title {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #4CAF50;
-}
-.sub-text {
-    text-align: center;
-    color: grey;
-    margin-bottom: 30px;
-}
-.stButton>button {
-    width: 100%;
-    border-radius: 10px;
-    height: 3em;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-}
-.result-box {
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #f5f5f5;
-    color: black;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown('<div class="main-title">🔗 AI URL Summarizer</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-text">Summarize any Website or YouTube video instantly</div>', unsafe_allow_html=True)
+st.title("🔗 AI URL Summarizer")
+st.write("Summarize any Website or YouTube video instantly")
 
 
 # -------------------- INPUT --------------------
-generic_url = st.text_input("🔍 Paste your URL here")
+generic_url = st.text_input("Enter URL")
 
 
 # -------------------- LLM --------------------
@@ -83,8 +44,26 @@ map_prompt = PromptTemplate.from_template(
 )
 
 combine_prompt = PromptTemplate.from_template(
-    "Combine these summaries into a clean, structured summary (~300 words):\n\n{text}"
+    "Combine into a final structured summary (~300 words):\n\n{text}"
 )
+
+
+# -------------------- HELPER FUNCTION --------------------
+def extract_text_from_url(url):
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers, timeout=10)
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Remove scripts/styles
+    for script in soup(["script", "style"]):
+        script.extract()
+
+    text = soup.get_text(separator="\n")
+
+    # Clean text
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    return "\n".join(lines)
 
 
 # -------------------- BUTTON --------------------
@@ -98,39 +77,15 @@ if st.button("✨ Generate Summary"):
         with st.spinner("🚀 Processing..."):
 
             # -------- LOAD --------
-            docs = None
-
             if "youtube.com" in generic_url or "youtu.be" in generic_url:
-                try:
-                    loader = YoutubeLoader.from_youtube_url(generic_url)
-                    docs = loader.load()
-                except Exception:
-                    st.error("❌ Failed to load YouTube video (maybe no captions)")
-                    st.stop()
+                loader = YoutubeLoader.from_youtube_url(generic_url)
+                docs = loader.load()
+                text_data = " ".join([doc.page_content for doc in docs])
 
             else:
-                # ✅ Primary loader (your working version)
-                try:
-                    loader = UnstructuredURLLoader(
-                        urls=[generic_url],
-                        headers={
-                            "User-Agent": "Mozilla/5.0",
-                        }
-                    )
-                    docs = loader.load()
+                text_data = extract_text_from_url(generic_url)
 
-                # 🔥 Fallback (if site breaks)
-                except Exception:
-                    st.warning("⚠️ Using fallback parser...")
-                    loader = UnstructuredURLLoader(
-                        urls=[generic_url],
-                        headers={"User-Agent": "Mozilla/5.0"},
-                        mode="elements",
-                        strategy="fast"
-                    )
-                    docs = loader.load()
-
-            if not docs:
+            if not text_data:
                 st.error("❌ No content extracted")
                 st.stop()
 
@@ -139,7 +94,7 @@ if st.button("✨ Generate Summary"):
                 chunk_size=2000,
                 chunk_overlap=200
             )
-            docs = splitter.split_documents(docs)
+            docs = splitter.create_documents([text_data])
 
             # -------- MAP --------
             map_chain = map_prompt | llm
@@ -157,11 +112,7 @@ if st.button("✨ Generate Summary"):
 
             # -------- OUTPUT --------
             st.success("✅ Summary Generated")
-
-            st.markdown(
-                f'<div class="result-box">{final_summary.content}</div>',
-                unsafe_allow_html=True
-            )
+            st.write(final_summary.content)
 
     except Exception as e:
         st.error("❌ Failed to process URL")
