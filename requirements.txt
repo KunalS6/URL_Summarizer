@@ -1,0 +1,13 @@
+streamlit
+
+langchain
+langchain-core
+langchain-community
+langchain-classic
+langchain-groq
+
+python-dotenv
+validators==0.28.1
+
+youtube-transcript-api
+unstructured
