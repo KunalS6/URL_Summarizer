@@ -14,10 +14,11 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # -------------------- ENV --------------------
 load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+
+groq_api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
 
 if not groq_api_key:
-    st.error("GROQ_API_KEY not found")
+    st.error("❌ GROQ_API_KEY not found")
     st.stop()
 
 
@@ -31,35 +32,34 @@ st.set_page_config(
 
 # -------------------- CUSTOM UI --------------------
 st.markdown("""
-    <style>
-        .main-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        .sub-text {
-            text-align: center;
-            color: grey;
-            margin-bottom: 30px;
-        }
-        .stButton>button {
-            width: 100%;
-            border-radius: 10px;
-            height: 3em;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 16px;
-        }
-        .result-box {
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #f5f5f5;
-            color: black;
-        }
-    </style>
+<style>
+.main-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #4CAF50;
+}
+.sub-text {
+    text-align: center;
+    color: grey;
+    margin-bottom: 30px;
+}
+.stButton>button {
+    width: 100%;
+    border-radius: 10px;
+    height: 3em;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+}
+.result-box {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    color: black;
+}
+</style>
 """, unsafe_allow_html=True)
-
 
 st.markdown('<div class="main-title">🔗 AI URL Summarizer</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-text">Summarize any Website or YouTube video instantly</div>', unsafe_allow_html=True)
@@ -82,7 +82,7 @@ map_prompt = PromptTemplate.from_template(
 )
 
 combine_prompt = PromptTemplate.from_template(
-    "Combine the summaries into a clean, structured summary (~300 words):\n\n{text}"
+    "Combine these summaries into a clean, structured summary (~300 words):\n\n{text}"
 )
 
 
@@ -102,7 +102,7 @@ if st.button("✨ Generate Summary"):
                     loader = YoutubeLoader.from_youtube_url(generic_url)
                     docs = loader.load()
                 except Exception:
-                    st.error("❌ Failed to load YouTube video")
+                    st.error("❌ Failed to load YouTube video (may not have captions)")
                     st.stop()
 
             else:
@@ -111,7 +111,9 @@ if st.button("✨ Generate Summary"):
                     headers={
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
                         "Accept-Language": "en-US,en;q=0.9",
-                    }
+                    },
+                    mode="elements",     # ✅ prevents heavy parsing
+                    strategy="fast"      # ✅ avoids spaCy usage
                 )
                 docs = loader.load()
 
