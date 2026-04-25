@@ -111,7 +111,8 @@ if st.button("✨ Generate Summary"):
                 loader = UnstructuredURLLoader(
                     urls=[generic_url],
                     headers={"User-Agent": "Mozilla/5.0"},
-                    mode="elements"
+                    mode="elements",
+                    strategy="fast"
                 )
                 docs = loader.load()
 
